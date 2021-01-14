@@ -3,6 +3,7 @@ package main
 import (
 	"archive/zip"
 	_ "encoding/base64"
+	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
@@ -148,14 +149,17 @@ func main() {
 	dd := DeploymentDescriptors{}
 	xml.Unmarshal(byteValue, &dd)
 
-	outFile.WriteString("{\n")
+	gvMap := make(map[string]string)
 	for _, nvp := range dd.NameValuePairs[0].NameValuePair {
+
 		key := nvp.Name
 		value := nvp.Value
-		outString := fmt.Sprintf("  %q : %q\n", key, value)
-		outFile.WriteString(outString)
+
+		gvMap[key] = value
 	}
-	outFile.WriteString("}\n")
+
+	gvJSON, err := json.MarshalIndent(gvMap, "", " ")
+	outFile.WriteString(string(gvJSON))
 
 	log.Println("Done")
 
