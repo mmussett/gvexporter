@@ -3,7 +3,6 @@ package main
 import (
 	"archive/zip"
 	_ "encoding/base64"
-	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
@@ -67,14 +66,10 @@ type DeploymentDescriptors struct {
 	Modules                     []Modules                     `xml:"Modules"`
 }
 
-type Raw struct {
-	Body[] *json.RawMessage `json`
-}
-
 func main() {
 
 	earFilename := flag.String("ear", "", "Input EAR Filename")
-	outputFilename := flag.String("o", "",  "Output Filename")
+	outputFilename := flag.String("o", "", "Output Filename")
 	flag.Parse()
 
 	if *earFilename == "" {
@@ -87,7 +82,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Printf("Extracting GV from EAR File %s to %s\n", *earFilename,*outputFilename)
+	log.Printf("Extracting GV from EAR File %s to %s\n", *earFilename, *outputFilename)
 
 	zr, err := zip.OpenReader(*earFilename)
 	if err != nil {
@@ -112,7 +107,7 @@ func main() {
 				log.Fatal(err)
 			}
 
-			_, err = io.Copy(tmpFile,zipFile)
+			_, err = io.Copy(tmpFile, zipFile)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -123,22 +118,19 @@ func main() {
 		}
 	}
 
-
-
 	if !found {
 		log.Fatal("Unable to find TIBCO.xml in EAR file")
 	}
 
-	inFile, err := os.OpenFile("./TIBCO.xml", os.O_RDONLY,0)
+	inFile, err := os.OpenFile("./TIBCO.xml", os.O_RDONLY, 0)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-
 	os.Remove(*outputFilename)
 	os.Remove("./TIBCO.xml")
 
-	outFile, err := os.OpenFile(*outputFilename,os.O_CREATE|os.O_WRONLY, 0644)
+	outFile, err := os.OpenFile(*outputFilename, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println(err)
 		panic(-1)
@@ -160,7 +152,7 @@ func main() {
 	for _, nvp := range dd.NameValuePairs[0].NameValuePair {
 		key := nvp.Name
 		value := nvp.Value
-		outString := fmt.Sprintf("  %q : %q\n",key,value)
+		outString := fmt.Sprintf("  %q : %q\n", key, value)
 		outFile.WriteString(outString)
 	}
 	outFile.WriteString("}\n")
